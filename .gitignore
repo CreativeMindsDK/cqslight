@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/.vs
+/src/*/bin/*/*
+/src/*/obj/*
+*.csproj.user
+/src/Transparency.WebApi/appsettings.sft.json
+/.vs
+/src/Transparency.WebApi/app_data/logs
+/src/CreativeMinds.CQSLight.SampleWebApp/Properties/launchSettings.json
