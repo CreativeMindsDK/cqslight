@@ -19,4 +19,4 @@ build_script:
 
 after_build:
   - ps: >-
-      Push-AppveyorArtifact src\creativeminds.cqslight\bin\release\*.nupkg
+      Push-AppveyorArtifact src\creativeminds.cqslight\bin\release\net8.0\*.nupkg
