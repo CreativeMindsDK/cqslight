@@ -6,6 +6,7 @@ using CreativeMinds.CQSLight.Validation;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -16,6 +17,8 @@ namespace CreativeMinds.CQSLight {
 	public abstract class DispatcherBase {
 		protected readonly IServiceProvider serviceProvider;
 		protected readonly ILogger logger;
+
+		protected Activity? activity;
 
 		protected DispatcherBase(IServiceProvider serviceProvider, ILogger logger) {
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -47,6 +50,7 @@ namespace CreativeMinds.CQSLight {
 
 			IEnumerable<AuthorisationResult> failures = authorisationResults.Where(r => r.Success == false);
 			if (failures.Any() == true) {
+				this.activity?.SetStatus(ActivityStatusCode.Error, "One or more authorisations has failures");
 				this.logger.LogError($"One or more authorisers returned failures {failures.Count()}");
 				throw new AuthorisationException(failures);
 			}
@@ -77,6 +81,7 @@ namespace CreativeMinds.CQSLight {
 
 			IEnumerable<ValidationResult> errors = validationResults.Where(r => r.Success == false);
 			if (errors.Any() == true) {
+				this.activity?.SetStatus(ActivityStatusCode.Error, "One or more validations has errors");
 				this.logger.LogError($"One or more validators returned errors {errors.Count()}");
 				throw new ValidationException(errors);
 			}

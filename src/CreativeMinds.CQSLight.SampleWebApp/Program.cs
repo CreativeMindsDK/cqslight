@@ -2,8 +2,42 @@ using CreativeMinds.CQSLight;
 using CreativeMinds.CQSLight.Abstract;
 using CreativeMinds.CQSLight.Decoraters;
 using Microsoft.AspNetCore.Mvc;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.AddOpenTelemetry()
+	.AddConsole();
+
+String serviceName = "CreativeMinds.CQSLight";
+String serviceVersion = "0.5.0.0";
+
+builder.Services.AddOpenTelemetry()
+	.WithMetrics(c => {
+		c.AddConsoleExporter();
+	})
+	.WithTracing(e => {
+		//e.AddAspNetCoreInstrumentation();
+		e.AddSource(serviceName);
+		e.ConfigureResource(resource =>
+		resource.AddService(
+		  serviceName: serviceName,
+		  serviceVersion: serviceVersion));
+		e.AddConsoleExporter();
+	});
+
+
+//using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+//	.AddSource(serviceName)
+//	.ConfigureResource(resource =>
+//		resource.AddService(
+//		  serviceName: serviceName,
+//		  serviceVersion: serviceVersion))
+//	.AddConsoleExporter()
+//	.Build();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,7 +87,7 @@ public class AddToBasketCommandHandler : ICommandHandler<AddToBasketCommand> {
 	}
 }
 
-[QueryHandler(typeof(DummyQueryHandler))]
+//[QueryHandler(typeof(DummyQueryHandler))]
 public record DummyQuery : IQuery<String> { }
 
 public class DummyQueryHandler : IQueryHandler<DummyQuery, String> {
