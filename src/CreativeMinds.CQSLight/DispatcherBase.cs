@@ -2,6 +2,7 @@
 using CreativeMinds.CQSLight.Authorisation;
 using CreativeMinds.CQSLight.Decoraters;
 using CreativeMinds.CQSLight.Exceptions;
+using CreativeMinds.CQSLight.Instrumentation;
 using CreativeMinds.CQSLight.Validation;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,12 +18,14 @@ namespace CreativeMinds.CQSLight {
 	public abstract class DispatcherBase {
 		protected readonly IServiceProvider serviceProvider;
 		protected readonly ILogger logger;
+		protected readonly CQSLightInstrumentation instrumentation;
 
-		protected Activity? activity;
+		protected Activity activity;
 
-		protected DispatcherBase(IServiceProvider serviceProvider, ILogger logger) {
+		protected DispatcherBase(IServiceProvider serviceProvider, ILogger logger, CQSLightInstrumentation instrumentation) {
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			this.instrumentation = instrumentation ?? throw new ArgumentNullException(nameof(instrumentation));
 		}
 
 		/// <summary>

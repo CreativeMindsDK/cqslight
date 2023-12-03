@@ -2,10 +2,13 @@ using CreativeMinds.CQSLight;
 using CreativeMinds.CQSLight.Abstract;
 using CreativeMinds.CQSLight.Decoraters;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry;
+using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+
+const String OtlpSection = "OpenTelemetry:Otlp";
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,15 +23,20 @@ builder.Services.AddOpenTelemetry()
 		c.AddConsoleExporter();
 	})
 	.WithTracing(e => {
-		//e.AddAspNetCoreInstrumentation();
-		e.AddSource(serviceName);
-		e.ConfigureResource(resource =>
-		resource.AddService(
-		  serviceName: serviceName,
-		  serviceVersion: serviceVersion));
 		e.AddConsoleExporter();
+		e.AddAspNetCoreInstrumentation();
+		e.AddHttpClientInstrumentation();
+		e.AddSource("CreativeMinds.CQSLight")
+			.SetSampler(new AlwaysOnSampler())
+			.ConfigureResource(res => {
+				res.AddService("CreativeMinds.CQSLight", "0.5.0.0");
+			});
+		e.AddOtlpExporter(otlpOptions => {
+			builder.Configuration.GetSection(OtlpSection).Bind(otlpOptions);
+		});
 	});
 
+builder.Services.Configure<AspNetCoreInstrumentationOptions>(builder.Configuration.GetSection("AspNetCoreInstrumentation"));
 
 //using var tracerProvider = Sdk.CreateTracerProviderBuilder()
 //	.AddSource(serviceName)
@@ -87,7 +95,7 @@ public class AddToBasketCommandHandler : ICommandHandler<AddToBasketCommand> {
 	}
 }
 
-//[QueryHandler(typeof(DummyQueryHandler))]
+[QueryHandler(typeof(DummyQueryHandler))]
 public record DummyQuery : IQuery<String> { }
 
 public class DummyQueryHandler : IQueryHandler<DummyQuery, String> {

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CreativeMinds.CQSLight.Instrumentation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.IO.Pipes;
 using System.Reflection;
 
 namespace CreativeMinds.CQSLight {
@@ -8,6 +8,7 @@ namespace CreativeMinds.CQSLight {
 	public static class ServiceCollectionExtensions {
 
 		public static IServiceCollection AddCQS(this IServiceCollection services, Assembly assembly) {
+			services.AddSingleton<CQSLightInstrumentation>();
 
 			services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 			services.AddScoped<IQueryDispatcher, QueryDispatcher>();

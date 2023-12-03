@@ -13,10 +13,10 @@ namespace CreativeMinds.CQSLight {
 
 	public class CommandDispatcher : DispatcherBase, ICommandDispatcher {
 
-		public CommandDispatcher(IServiceProvider serviceProvider, ILogger<CommandDispatcher> logger) : base(serviceProvider, logger) {		}
+		public CommandDispatcher(IServiceProvider serviceProvider, ILogger<CommandDispatcher> logger, CQSLightInstrumentation instrumentation) : base(serviceProvider, logger, instrumentation) { }
 
 		public async Task DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : ICommand {
-			this.activity = CQSLightInstrumentation.ActivitySource.StartActivity(InstrumentationConstants.CommandDispatchActivityName, ActivityKind.Internal);
+			this.activity = this.instrumentation.ActivitySource.StartActivity(InstrumentationConstants.CommandDispatchActivityName);
 
 			if (this.activity != null) {
 				if (this.activity.IsAllDataRequested) {
