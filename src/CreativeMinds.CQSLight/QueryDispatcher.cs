@@ -3,6 +3,7 @@ using CreativeMinds.CQSLight.Decoraters;
 using CreativeMinds.CQSLight.Exceptions;
 using CreativeMinds.CQSLight.Instrumentation;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Trace;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -16,13 +17,9 @@ namespace CreativeMinds.CQSLight {
 		public QueryDispatcher(IServiceProvider serviceProvider, ILogger<QueryDispatcher> logger, CQSLightInstrumentation instrumentation) : base(serviceProvider, logger, instrumentation) { }
 
 		public async Task<TResult> DispatchAsync<TQuery, TResult>(TQuery query, CancellationToken cancellationToken) where TQuery : IQuery<TResult> {
-			this.activity = this.instrumentation.ActivitySource.StartActivity(InstrumentationConstants.QueryDispatchActivityName);
+			this.activity = this.instrumentation.Tracer.StartActiveSpan(InstrumentationConstants.QueryDispatchActivityName);
 
-			if (this.activity != null) {
-				if (this.activity.IsAllDataRequested) {
-					this.activity.SetTag(InstrumentationConstants.Type, query.GetType().Name);
-				}
-			}
+			this.activity?.SetAttribute(InstrumentationConstants.Type, query.GetType().Name);
 
 			QueryHandlerAttribute? handlerAttribute = query.GetType().GetCustomAttribute<QueryHandlerAttribute>(true);
 			if (handlerAttribute != null) {
@@ -34,17 +31,17 @@ namespace CreativeMinds.CQSLight {
 				IQueryHandler<TQuery, TResult>? queryHandlerInstance = this.serviceProvider.GetService(handlerAttribute.Handler) as IQueryHandler<TQuery, TResult>;
 				if (queryHandlerInstance != null) {
 					var output = await queryHandlerInstance.HandleAsync(query, cancellationToken);
-					this.activity?.SetStatus(ActivityStatusCode.Ok, "Handler has handled the query");
+					this.activity?.SetStatus(Status.Ok);
 					return output;
 				}
 				else {
-					this.activity?.SetStatus(ActivityStatusCode.Error, "Found handler, but not correct type");
+					this.activity?.SetStatus(Status.Error);
 					this.logger.LogError($"The query handler for the type '{query.GetType()}' failed to be cast to an IQueryHandler<TQuery, TResult>");
 					throw new CommandHandlerHasWrongTypeException();
 				}
 			}
 			else {
-				this.activity?.SetStatus(ActivityStatusCode.Error, "No handler found");
+				this.activity?.SetStatus(Status.Error);
 				this.logger.LogError($"Failed to locate a query handler for the type '{query.GetType()}'");
 				throw new NoCommandHandlerFoundException();
 			}

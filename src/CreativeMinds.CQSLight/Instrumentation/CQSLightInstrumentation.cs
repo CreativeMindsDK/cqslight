@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using OpenTelemetry.Trace;
+using System;
 using System.Reflection;
 
 namespace CreativeMinds.CQSLight.Instrumentation {
@@ -9,10 +9,8 @@ namespace CreativeMinds.CQSLight.Instrumentation {
 		public static readonly String ActivitySourceName = AssemblyName.Name;
 		public static readonly Version Version = AssemblyName.Version;
 
-		public CQSLightInstrumentation() {
-			this.ActivitySource = new(ActivitySourceName, Version.ToString());
-		}
+		private static Tracer tracer = TracerProvider.Default.GetTracer(ActivitySourceName, Version.ToString());
 
-		public ActivitySource ActivitySource { get; }
+		public Tracer Tracer { get { return CQSLightInstrumentation.tracer; } }
 	}
 }

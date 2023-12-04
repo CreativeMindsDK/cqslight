@@ -5,6 +5,7 @@ using CreativeMinds.CQSLight.Exceptions;
 using CreativeMinds.CQSLight.Instrumentation;
 using CreativeMinds.CQSLight.Validation;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +21,7 @@ namespace CreativeMinds.CQSLight {
 		protected readonly ILogger logger;
 		protected readonly CQSLightInstrumentation instrumentation;
 
-		protected Activity activity;
+		protected TelemetrySpan activity;
 
 		protected DispatcherBase(IServiceProvider serviceProvider, ILogger logger, CQSLightInstrumentation instrumentation) {
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -53,7 +54,7 @@ namespace CreativeMinds.CQSLight {
 
 			IEnumerable<AuthorisationResult> failures = authorisationResults.Where(r => r.Success == false);
 			if (failures.Any() == true) {
-				this.activity?.SetStatus(ActivityStatusCode.Error, "One or more authorisations has failures");
+				this.activity?.SetStatus(Status.Error);
 				this.logger.LogError($"One or more authorisers returned failures {failures.Count()}");
 				throw new AuthorisationException(failures);
 			}
@@ -84,7 +85,7 @@ namespace CreativeMinds.CQSLight {
 
 			IEnumerable<ValidationResult> errors = validationResults.Where(r => r.Success == false);
 			if (errors.Any() == true) {
-				this.activity?.SetStatus(ActivityStatusCode.Error, "One or more validations has errors");
+				this.activity?.SetStatus(Status.Error);
 				this.logger.LogError($"One or more validators returned errors {errors.Count()}");
 				throw new ValidationException(errors);
 			}
