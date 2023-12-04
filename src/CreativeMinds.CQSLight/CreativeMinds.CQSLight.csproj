@@ -2,16 +2,16 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<Title>Light-weight Command and Query Separation</Title>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>0.5.0</Version>
 		<Authors>steentottrup</Authors>
 		<Company>CreativeMinds ApS</Company>
-		<RepositoryUrl>https://github.com/CreativeMindsDK/cqslight.git</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageTags>cqs</PackageTags>
+		<Description>A light-weight command and query separation library</Description>
+		<Copyright>Copyright 2023 (C) CreativeMinds ApS. All rights reserved.</Copyright>
+		<PackageLicenseUrl>https://www.creativeminds.dk/license</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/CreativeMindsDK/cqslight</PackageProjectUrl>
-		<Version>0.5.0</Version>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/CreativeMindsDK/cqslight</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
