@@ -47,6 +47,34 @@ public class CreateForumAuthoriser : IAuthoriser<CreateForumCommand>
 ```
 You can add one or more authorisers for each command.
 
+###### Dispatching commands and queries
+
+When you need to call the code of a command or a query, all you need to do is get a hold of a ```ICommandDispatcher``` or a ```IQueryDispatcher``` and dispatch the command/query.
+
+```
+public SaleController(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) {
+	this.commandDispatcher = commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
+	this.queryDispatcher = queryDispatcher ?? throw new ArgumentNullException(nameof(queryDispatcher));
+}
+```
+
+```
+[HttpPut("{saleId}/{bidId}/accept")]
+public async Task<IActionResult> AcceptBidAsync(String saleId, String bidId, CancellationToken cancellationToken) {
+	// A command does not return anything, so unless an exception is throw, everything went according to the plan!
+	await this.commandDispatcher.DispatchAsync<AcceptBidCommand>(new AcceptBidCommand { SaleId = saleId, BidId = bidId }, cancellationToken);
+	return Ok();
+}
+```
+
+```
+[AllowAnonymous]
+[HttpGet]
+public async Task<IEnumerable<Dtos.SaleBaseForList>> GetSalesAsync(CancellationToken cancellationToken) {
+	return await this.queryDispatcher.DispatchAsync<FindActiveSalesQuery, IEnumerable<Dtos.SaleBaseForList>>(new FindActiveSalesQuery { PageIndex = 0 }, cancellationToken);
+}
+```
+
 # CreativeMinds CQSLight Dependency Injection
 
 Unlike CreativeMinds.CQS, CreativeMinds.CQSLight uses the build-in dependency injection of .NET, and does not need a 3rd party library.
