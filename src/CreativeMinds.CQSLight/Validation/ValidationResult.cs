@@ -7,6 +7,8 @@ namespace CreativeMinds.CQSLight.Validation {
 	public class ValidationResult {
 		protected readonly List<ValidationError> errors = new List<ValidationError>();
 
+		public ValidationResult() { }
+
 		internal ValidationResult(IEnumerable<ValidationError> errors) {
 			this.errors = errors.ToList() ?? throw new ArgumentNullException(nameof(errors));
 		}
