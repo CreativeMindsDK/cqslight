@@ -10,7 +10,10 @@ namespace CreativeMinds.CQSLight.Validation {
 		public ValidationResult() { }
 
 		internal ValidationResult(IEnumerable<ValidationError> errors) {
-			this.errors = errors.ToList() ?? throw new ArgumentNullException(nameof(errors));
+			if (errors == null) {
+				throw new ArgumentNullException(nameof(errors));
+			}
+			this.errors = errors.ToList();
 		}
 
 		public void AddError(String label, Int32 errorType) {
