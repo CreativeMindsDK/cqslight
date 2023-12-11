@@ -7,29 +7,30 @@ namespace CreativeMinds.CQSLight {
 
 	public static class ServiceCollectionExtensions {
 
-		public static IServiceCollection AddCQS(this IServiceCollection services, Assembly assembly) {
+		public static IServiceCollection AddCQS(this IServiceCollection services, params Assembly[] assemblies) {
 			services.AddSingleton<CQSLightInstrumentation>();
 
 			services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 			services.AddScoped<IQueryDispatcher, QueryDispatcher>();
 
-			foreach (Type type in assembly.GetTypes()) {
-				foreach (Type interfac in type.GetInterfaces()) {
-					if (interfac.IsGenericType == true && interfac.Name == "ICommandHandler`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
-						services.AddScoped(type);
-					}
-					else if (interfac.IsGenericType == true && interfac.Name == "IQueryHandler`2" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
-						services.AddScoped(type);
-					}
-					else if (interfac.IsGenericType == true && interfac.Name == "IAuthoriser`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
-						services.AddScoped(type);
-					}
-					else if (interfac.IsGenericType == true && interfac.Name == "IValidator`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
-						services.AddScoped(type);
+			foreach (Assembly assembly in assemblies) {
+				foreach (Type type in assembly.GetTypes()) {
+					foreach (Type interfac in type.GetInterfaces()) {
+						if (interfac.IsGenericType == true && interfac.Name == "ICommandHandler`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
+							services.AddScoped(type);
+						}
+						else if (interfac.IsGenericType == true && interfac.Name == "IQueryHandler`2" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
+							services.AddScoped(type);
+						}
+						else if (interfac.IsGenericType == true && interfac.Name == "IAuthoriser`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
+							services.AddScoped(type);
+						}
+						else if (interfac.IsGenericType == true && interfac.Name == "IValidator`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
+							services.AddScoped(type);
+						}
 					}
 				}
 			}
-
 
 			return services;
 		}

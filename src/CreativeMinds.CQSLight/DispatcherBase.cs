@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -48,7 +47,7 @@ namespace CreativeMinds.CQSLight {
 					authorisationResults.Add(await authoriserInstance.AuthoriseAsync(message, cancellationToken));
 				}
 				else {
-					this.logger.LogWarning($"Trying to a instance of type '{authoriserAttribute.Authorisor}' failed, or it wasn't an IAuthoriser<TCommand>");
+					this.logger.LogWarning($"Trying to a instance of type '{authoriserAttribute.Authorisor}' failed, or it wasn't an IAuthoriser<TMessage>");
 				}
 			}
 
@@ -74,12 +73,12 @@ namespace CreativeMinds.CQSLight {
 
 			List<ValidationResult> validationResults = [];
 			foreach (ValidatorAttribute validatorAttribute in validatorAttributes) {
-				IValidator<TMessage>? validatorInstance = this.serviceProvider.GetService(validatorAttribute.Validator) as IValidator<TMessage>;
+				IValidator<TMessage> validatorInstance = this.serviceProvider.GetService(validatorAttribute.Validator) as IValidator<TMessage>;
 				if (validatorInstance != null) {
 					validationResults.Add(await validatorInstance.ValidateAsync(message, cancellationToken));
 				}
 				else {
-					this.logger.LogWarning($"Trying to a instance of type '{validatorAttribute.Validator}' failed, or it wasn't an IAuthoriser<TCommand>");
+					this.logger.LogWarning($"Trying to get an instance of type '{validatorAttribute.Validator}' failed, or it wasn't an IValidator<TMessage>");
 				}
 			}
 

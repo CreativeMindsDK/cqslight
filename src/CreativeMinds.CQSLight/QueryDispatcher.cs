@@ -5,7 +5,6 @@ using CreativeMinds.CQSLight.Instrumentation;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;

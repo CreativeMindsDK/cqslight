@@ -27,7 +27,7 @@ namespace CreativeMinds.CQSLight {
 
 				await this.CheckValidationAsync(command, cancellationToken);
 
-				ICommandHandler<TCommand>? commandHandlerInstance = this.serviceProvider.GetService(handlerAttribute.Handler) as ICommandHandler<TCommand>;
+				ICommandHandler<TCommand> commandHandlerInstance = this.serviceProvider.GetService(handlerAttribute.Handler) as ICommandHandler<TCommand>;
 				if (commandHandlerInstance != null) {
 					await commandHandlerInstance.HandleAsync(command, cancellationToken);
 					this.activity?.SetStatus(Status.Ok);
