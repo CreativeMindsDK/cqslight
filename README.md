@@ -12,7 +12,7 @@ Commands and queries will have their authorisers executed first, if any are pres
 
 We have decided to remove the need for a 3rd party library to handle dependency inject, so instead of letting the library figure out the handlers of the commands and query, you now use decorators on the query/command classes.
 
-Only one ```CommandHandlerAttribute``` and ```QueryHandlerttribute``` is allowed per class. The types provided does have to implement either the ```ICommandHandler<TCommand>``` and ```IQueryHandler<TQuery, TResult>``` interfaces.
+Only one ```CommandHandlerAttribute``` and ```QueryHandlerttribute``` is allowed per class. The types provided does have to implement either the ```ICommandHandler<TCommand>``` or ```IQueryHandler<TQuery, TResult>``` interfaces.
 
 ```
 public class CreateForumCommandHandler : ICommandHandler<CreateForumCommand> {
@@ -76,7 +76,7 @@ You can add one or more authorisers for each command/query.
 
 ###### Dispatching commands and queries
 
-When you need to call the code of a command or a query, all you need to do is get a hold of a ```ICommandDispatcher``` or a ```IQueryDispatcher``` and dispatch the command/query.
+When you need to call the code of a command or a query, all you need to do is get a hold of an ```ICommandDispatcher``` or an ```IQueryDispatcher``` and dispatch the command/query.
 
 ```
 public SaleController(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) {
