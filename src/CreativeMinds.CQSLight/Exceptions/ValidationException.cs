@@ -5,11 +5,11 @@ using System.Collections.Generic;
 namespace CreativeMinds.CQSLight.Exceptions {
 
 	public class ValidationException : ApplicationException {
-		protected readonly IEnumerable<ValidationResult> results;
+		public readonly IEnumerable<ValidationResult> Results;
 
 		public ValidationException(ValidationResult result) {
 			if (result != null) {
-				this.results = new ValidationResult[] { result };
+				this.Results = new ValidationResult[] { result };
 			}
 			else {
 				throw new ArgumentNullException(nameof(result));
@@ -19,7 +19,7 @@ namespace CreativeMinds.CQSLight.Exceptions {
 		public ValidationException(IEnumerable<ValidationError> results) : this(new ValidationResult(results)) { }
 
 		public ValidationException(IEnumerable<ValidationResult> results) {
-			this.results = results ?? throw new ArgumentNullException(nameof(results));
+			this.Results = results ?? throw new ArgumentNullException(nameof(results));
 		}
 	}
 }
