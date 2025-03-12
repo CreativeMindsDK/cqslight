@@ -2,9 +2,12 @@
 using CreativeMinds.CQSLight.Decoraters;
 using CreativeMinds.CQSLight.Exceptions;
 using CreativeMinds.CQSLight.Instrumentation;
+using CreativeMinds.CQSLight.Validation;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +28,23 @@ namespace CreativeMinds.CQSLight {
 
 				await this.CheckAuthorisationAsync(query, cancellationToken);
 
-				await this.CheckValidationAsync(query, cancellationToken);
+				var errors = await this.GetValidationStatusAsync(query, cancellationToken);
+
+				IEnumerable<ValidationFailuresHandlerAttribute> validationFailuresHandlerAttributes = query.GetType().GetCustomAttributes<CreativeMinds.CQSLight.Decoraters.ValidationFailuresHandlerAttribute>(true);
+				if (validationFailuresHandlerAttributes.Any() == false) {
+					(this.serviceProvider.GetService(typeof(DefaultQueryValidationFailuresHandler)) as DefaultQueryValidationFailuresHandler).Handle(errors, cancellationToken);
+				}
+				else {
+					foreach (ValidationFailuresHandlerAttribute validationFailuresHandlerAttribute in validationFailuresHandlerAttributes) {
+						IQueryValidationFailuresHandler<TQuery, TResult> validatorInstance = this.serviceProvider.GetService(validationFailuresHandlerAttribute.ValidationFailuresHandler) as IQueryValidationFailuresHandler<TQuery, TResult>;
+						if (validatorInstance != null) {
+							return await validatorInstance.HandleAsync(errors, cancellationToken);
+						}
+						else {
+							this.logger.LogWarning($"Trying to get an instance of type '{validationFailuresHandlerAttribute.ValidationFailuresHandler}' failed, or it wasn't an IValidator<TMessage>");
+						}
+					}
+				}
 
 				IQueryHandler<TQuery, TResult>? queryHandlerInstance = this.serviceProvider.GetService(handlerAttribute.Handler) as IQueryHandler<TQuery, TResult>;
 				if (queryHandlerInstance != null) {

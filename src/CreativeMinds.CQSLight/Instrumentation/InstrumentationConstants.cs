@@ -10,6 +10,8 @@ namespace CreativeMinds.CQSLight.Instrumentation {
 		public const String CommandDispatchActivityName = "CommandDispatch";
 		public const String QueryDispatchActivityName = "QueryDispatch";
 
+		public const String DefaultQueryValidationsFailureHandlerActivityName = "QueryValidationsFailureHandler";
+
 		public const String ActivityKey = "cqslight_activity_key";
 		public const String ActivityContextKey = "cqslight_activity_context";
 	}

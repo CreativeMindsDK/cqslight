@@ -1,4 +1,5 @@
 ﻿using CreativeMinds.CQSLight.Instrumentation;
+using CreativeMinds.CQSLight.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
@@ -12,6 +13,8 @@ namespace CreativeMinds.CQSLight {
 
 			services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 			services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+
+			services.AddSingleton<DefaultQueryValidationFailuresHandler>();
 
 			foreach (Assembly assembly in assemblies) {
 				foreach (Type type in assembly.GetTypes()) {

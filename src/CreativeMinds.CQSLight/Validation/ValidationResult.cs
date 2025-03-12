@@ -20,6 +20,10 @@ namespace CreativeMinds.CQSLight.Validation {
 			this.errors.Add(new ValidationError(label, errorType));
 		}
 
+		public void AddError(ValidationError error) {
+			this.errors.Add(error);
+		}
+
 		public IEnumerable<ValidationError> Errors { get { return this.errors; } }
 		public Boolean Success { get { return this.errors.Any() == false; } }
 	}

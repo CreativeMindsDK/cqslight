@@ -5,6 +5,7 @@ using CreativeMinds.CQSLight.Instrumentation;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,12 @@ namespace CreativeMinds.CQSLight {
 
 				await this.CheckAuthorisationAsync(command, cancellationToken);
 
-				await this.CheckValidationAsync(command, cancellationToken);
+				var errors = await this.GetValidationStatusAsync(command, cancellationToken);
+				if (errors.Any() == true) {
+					this.activity?.SetStatus(Status.Error);
+					this.logger.LogError($"One or more validators returned errors {errors.Count()}");
+					throw new ValidationException(errors);
+				}
 
 				ICommandHandler<TCommand> commandHandlerInstance = this.serviceProvider.GetService(handlerAttribute.Handler) as ICommandHandler<TCommand>;
 				if (commandHandlerInstance != null) {

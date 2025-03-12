@@ -67,12 +67,12 @@ namespace CreativeMinds.CQSLight {
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
 		/// <exception cref="ValidationException">If one or more validations returns one or more errors</exception>
-		protected async Task CheckValidationAsync<TMessage>(TMessage message, CancellationToken cancellationToken) where TMessage : IMessage {
+		protected async Task<IEnumerable<ValidationResult>> GetValidationStatusAsync<TMessage>(TMessage message, CancellationToken cancellationToken) where TMessage : IMessage {
 			IEnumerable<ValidatorAttribute> validatorAttributes = message.GetType().GetCustomAttributes<CreativeMinds.CQSLight.Decoraters.ValidatorAttribute>(true);
 			this.logger.LogDebug($"Found {validatorAttributes.Count()} validators for the type '{message.GetType()}'");
 
 			List<ValidationResult> validationResults = [];
-			foreach (ValidatorAttribute validatorAttribute in validatorAttributes) {
+			foreach (ValidatorAttribute validatorAttribute in validatorAttributes.OrderBy(a => a.Priority)) {
 				IValidator<TMessage> validatorInstance = this.serviceProvider.GetService(validatorAttribute.Validator) as IValidator<TMessage>;
 				if (validatorInstance != null) {
 					validationResults.Add(await validatorInstance.ValidateAsync(message, cancellationToken));
@@ -82,13 +82,7 @@ namespace CreativeMinds.CQSLight {
 				}
 			}
 
-			IEnumerable<ValidationResult> errors = validationResults.Where(r => r.Success == false);
-			if (errors.Any() == true) {
-				this.activity?.SetStatus(Status.Error);
-				this.logger.LogError($"One or more validators returned errors {errors.Count()}");
-				throw new ValidationException(errors);
-			}
+			return validationResults.Where(r => r.Success == false);
 		}
-
 	}
 }
