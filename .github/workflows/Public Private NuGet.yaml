@@ -35,7 +35,7 @@ jobs:
           dotnet-version: 9.x
 
       - name: Add nuget source
-        run: dotnet nuget add source 'https://nuget.pkg.github.com/CreativeMindsDK/index.json' --name github --username steentottrup --password ${{secrets.NUGET_API_KEY}} --store-password-in-clear-text
+        run: dotnet nuget add source 'https://nuget.pkg.github.com/CreativeMindsDK/index.json' --name github --username steentottrup --password ${{secrets.PVT_NUGET_API_KEY}} --store-password-in-clear-text
 
       - name: Restore dependencies
         run: dotnet restore $SOLUTION
@@ -57,4 +57,4 @@ jobs:
 
       - name: Publish
         working-directory: ./src
-        run: dotnet nuget push **\*.nupkg --source 'https://nuget.pkg.github.com/CreativeMindsDK/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+        run: dotnet nuget push **\*.nupkg --source 'https://nuget.pkg.github.com/CreativeMindsDK/index.json' --api-key ${{secrets.PVT_NUGET_API_KEY}}
