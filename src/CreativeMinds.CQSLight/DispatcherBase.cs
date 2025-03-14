@@ -73,6 +73,7 @@ namespace CreativeMinds.CQSLight {
 
 			List<ValidationResult> validationResults = [];
 			foreach (ValidatorAttribute validatorAttribute in validatorAttributes.OrderBy(a => a.Priority)) {
+				var tes = this.serviceProvider.GetService(validatorAttribute.Validator);
 				IValidator<TMessage> validatorInstance = this.serviceProvider.GetService(validatorAttribute.Validator) as IValidator<TMessage>;
 				if (validatorInstance != null) {
 					validationResults.Add(await validatorInstance.ValidateAsync(message, cancellationToken));

@@ -30,18 +30,20 @@ namespace CreativeMinds.CQSLight {
 
 				var errors = await this.GetValidationStatusAsync(query, cancellationToken);
 
-				IEnumerable<ValidationFailuresHandlerAttribute> validationFailuresHandlerAttributes = query.GetType().GetCustomAttributes<CreativeMinds.CQSLight.Decoraters.ValidationFailuresHandlerAttribute>(true);
-				if (validationFailuresHandlerAttributes.Any() == false) {
-					(this.serviceProvider.GetService(typeof(DefaultQueryValidationFailuresHandler)) as DefaultQueryValidationFailuresHandler).Handle(errors, cancellationToken);
-				}
-				else {
-					foreach (ValidationFailuresHandlerAttribute validationFailuresHandlerAttribute in validationFailuresHandlerAttributes) {
-						IQueryValidationFailuresHandler<TQuery, TResult> validatorInstance = this.serviceProvider.GetService(validationFailuresHandlerAttribute.ValidationFailuresHandler) as IQueryValidationFailuresHandler<TQuery, TResult>;
-						if (validatorInstance != null) {
-							return await validatorInstance.HandleAsync(errors, cancellationToken);
-						}
-						else {
-							this.logger.LogWarning($"Trying to get an instance of type '{validationFailuresHandlerAttribute.ValidationFailuresHandler}' failed, or it wasn't an IValidator<TMessage>");
+				if (errors.Any() == true) {
+					IEnumerable<ValidationFailuresHandlerAttribute> validationFailuresHandlerAttributes = query.GetType().GetCustomAttributes<CreativeMinds.CQSLight.Decoraters.ValidationFailuresHandlerAttribute>(true);
+					if (validationFailuresHandlerAttributes.Any() == false) {
+						(this.serviceProvider.GetService(typeof(DefaultQueryValidationFailuresHandler)) as DefaultQueryValidationFailuresHandler).Handle(errors, cancellationToken);
+					}
+					else {
+						foreach (ValidationFailuresHandlerAttribute validationFailuresHandlerAttribute in validationFailuresHandlerAttributes) {
+							IQueryValidationFailuresHandler<TQuery, TResult> validatorInstance = this.serviceProvider.GetService(validationFailuresHandlerAttribute.ValidationFailuresHandler) as IQueryValidationFailuresHandler<TQuery, TResult>;
+							if (validatorInstance != null) {
+								return await validatorInstance.HandleAsync(errors, cancellationToken);
+							}
+							else {
+								this.logger.LogWarning($"Trying to get an instance of type '{validationFailuresHandlerAttribute.ValidationFailuresHandler}' failed, or it wasn't an IValidator<TMessage>");
+							}
 						}
 					}
 				}

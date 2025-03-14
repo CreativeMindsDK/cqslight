@@ -31,6 +31,9 @@ namespace CreativeMinds.CQSLight {
 						else if (interfac.IsGenericType == true && interfac.Name == "IValidator`1" && interfac.Namespace == "CreativeMinds.CQSLight.Abstract") {
 							services.AddScoped(type);
 						}
+						else if (interfac.IsGenericType == true && interfac.Name == "IQueryValidationFailuresHandler`2" && interfac.Namespace == "CreativeMinds.CQSLight.Validation") {
+							services.AddScoped(type);
+						}
 					}
 				}
 			}
